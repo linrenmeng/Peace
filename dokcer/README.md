@@ -1,50 +1,50 @@
 #### repo_python 
 
-每个文件夹储存github的python仓库，以reponame命名
+Each folder contains a github python repository named reponame
 
 
 
 #### venv_python
 
-每个文件夹储存每个python仓库的虚拟环境，以owner_reponame命名
+Each folder holds a virtual environment for each python repository, named owner_reponame
 
 
 
 #### test/testdemo.py
 
-初步测试pytest运行每个仓库，并且抓取cpu指令与空间等结果，储存在/results中
+Preliminary tests pytest runs each repository and fetches cpu instructions, space, and so on to store in /results
 
 
 
 #### results
 
-储存一些结果
+Store some results
 
 
 
 #### llmchange.py
 
-替换LLM优化后的代码或还原原始提取代码
+Replace the LLM-optimized code or restore the original extracted code
 
 
 
 #### findsave.py, output.py,outputsave.py
 
-find是测试，output是完整
+find is the test, and output is complete
 
-提取目标函数函数体，并保存
+Extract the body of the target function and save it
 
 
 
 #### copy_conftest.py
 
-将data/conftest.py复制到每一个仓库根目录下
+Copy data/conftest.py to the root of each repository
 
 
 
 #### opt_venv_python.py
 
-为所有虚拟环境安装包或统一操作
+Install packages or unify operations for all virtual environments
 
 
 
