@@ -1,0 +1,419 @@
+{
+    "psf_black":[{
+        "owner":"psf",
+        "reponame":"black",
+        "target_file":"src/black/strings.py",
+        "target_class": null,
+        "target_func":"lines_with_leading_tabs_expanded",
+        "desc":"",
+        "sha":"f00093672628d212b8965a8993cee8bedf5fe9b8",
+        "prompt":"Fix catastrophic performance in lines_with_leading_tabs_expanded()",
+        "testcases":"    def test_lines_with_leading_tabs_expanded(self) -> None:\n        # See CVE-2024-21503. Mostly test that this completes in a reasonable\n        # time.\n        payload = \"\t\" * 10_000\n        assert lines_with_leading_tabs_expanded(payload) == [payload]\n        tab = \" \" * 8\n        assert lines_with_leading_tabs_expanded(\"\tx\") == [f\"{tab}x\"]\n        assert lines_with_leading_tabs_expanded(\"\t\tx\") == [f\"{tab}{tab}x\"]\n        assert lines_with_leading_tabs_expanded(\"\tx\n  y\") == [f\"{tab}x\", \"  y\"]"
+        
+    }],
+    "aws_aws-sam-cli":[{
+        "owner":"aws",
+        "reponame":"aws-sam-cli",
+        "target_file":"samcli/cli/types.py",
+        "target_class": "CfnTags",
+        "target_func":"convert",
+        "desc":"",
+        "sha":"5b49ef6c9c6e61a1f13b084450ddccd454859130",
+        "prompt":"fix: improve tag parsing performance for list input",
+        "testcases":"class TestCfnTags(TestCase):    def setUp(self):        self.param_type = CfnTags()    @parameterized.expand(        [            # Just a string            (\"some string\"),            # Wrong notation            # (\"a==b\"),            # Wrong multi-key notation            # (\"a==b,c==d\"),        ]    )    def test_must_fail_on_invalid_format(self, input):        self.param_type.fail = Mock()        self.param_type.convert(input, \"param\", \"ctx\")        self.param_type.fail.assert_called_with(ANY, \"param\", \"ctx\")    @parameterized.expand(        [            ((\"a=b\",), {\"a\": \"b\"}),            ((\"a=b\", \"c=d\"), {\"a\": \"b\", \"c\": \"d\"}),            (('\"a+-=._:/@\"=\"b+-=._:/@\" \"--c=\"=\"=d/\"',), {\"a+-=._:/@\": \"b+-=._:/@\", \"--c=\": \"=d/\"}),            (('owner:name=\"son of anton\"',), {\"owner:name\": \"son of anton\"}),            ((\"a=012345678901234567890123456789\",), {\"a\": \"012345678901234567890123456789\"}),            (                (\"a=012345678901234567890123456789 name=this-is-a-very-long-tag-value-now-it-should-not-fail\"),                {\"a\": \"012345678901234567890123456789\", \"name\": \"this-is-a-very-long-tag-value-now-it-should-not-fail\"},            ),            (                (\"a=012345678901234567890123456789\", \"c=012345678901234567890123456789\"),                {\"a\": \"012345678901234567890123456789\", \"c\": \"012345678901234567890123456789\"},            ),            ((\"\",), {}),            # list as input            ([], {}),            (                [\"stage=int\", \"company:application=awesome-service\", \"company:department=engineering\"],                {\"stage\": \"int\", \"company:application\": \"awesome-service\", \"company:department\": \"engineering\"},            ),        ]    )    def test_successful_parsing(self, input, expected):        result = self.param_type.convert(input, None, None)        self.assertEqual(result, expected, msg=\"Failed with Input = \" + str(input))    @parameterized.expand(        [            (                [\"stage=int\", \"company:application=awesome-service\", \"company:department=engineering\"],                {\"stage\": \"int\", \"company:application\": \"awesome-service\", \"company:department\": \"engineering\"},            ),            (                ['owner:name=\"son of anton\"', \"company:application=awesome-service\", \"company:department=engineering\"],                {                    \"owner:name\": \"son of anton\",                    \"company:application\": \"awesome-service\",                    \"company:department\": \"engineering\",                },            ),        ]    )    @patch(\"re.findall\")    def test_no_regex_parsing_if_input_is_list(self, input, expected, regex_mock):        result = self.param_type.convert(input, None, None)        self.assertEqual(result, expected, msg=\"Failed with Input = \" + str(input))        regex_mock.assert_not_called()"
+    }],
+    "aws_serverless-application-model":[{
+        "owner":"aws",
+        "reponame":"serverless-application-model",
+        "target_file":"samtranslator/utils/py27hash_fix.py",
+        "target_class": "Py27Keys",
+        "target_func":"_get_key_idx",
+        "desc":"",
+        "sha":"dfb1307e7e7b9059bb73c9c96f4e4d9c64f0f6af",
+        "prompt":"Py27dict deepcopy performance (#2331)* Implement __deepcopy__ to improve performance* Cache py27 hash for Py27UniStr to improve performance",
+        "testcases":"    def test_py27_hash(self):        a = Py27UniStr(\"abcdef\")        self.assertEqual(a._get_py27_hash(), 484452592760221083)        # do it twice since _get_py27_hash caches the hash        self.assertEqual(a._get_py27_hash(), 484452592760221083)"
+    }],
+    "jopohl_urh":[{
+        "owner":"jopohl",
+        "reponame":"urh",
+        "target_file":"src/urh/ainterpretation/AutoInterpretation.py",
+        "target_class": null,
+        "target_func":"merge_plateau_lengths",
+        "desc":"",
+        "sha":"d300ba5c335c4df6138279b9d8c937956bd2bc7c",
+        "prompt":"Improve Auto Interpretation Performance (#814)* cythonize merge_plateaus* add a threshold for plateau count to prevent running forever",
+        "testcases":"    def test_merge_plateau_lengths(self):        self.assertEqual(AutoInterpretation.merge_plateau_lengths([]), [])        self.assertEqual(AutoInterpretation.merge_plateau_lengths([42]), [42])        self.assertEqual(AutoInterpretation.merge_plateau_lengths([100, 100, 100]), [100, 100, 100])        self.assertEqual(AutoInterpretation.merge_plateau_lengths([100, 49, 1, 50, 100]), [100, 100, 100])        self.assertEqual(AutoInterpretation.merge_plateau_lengths([100, 48, 2, 50, 100]), [100, 100, 100])        self.assertEqual(AutoInterpretation.merge_plateau_lengths([100, 100, 67, 1, 10, 1, 21]), [100, 100, 100])        self.assertEqual(AutoInterpretation.merge_plateau_lengths([100, 100, 67, 1, 10, 1, 21, 100, 50, 1, 49]),                         [100, 100, 100, 100, 100])        self.assertEqual(self.__run_merge([100, 49, 1, 50, 100]), [100, 100, 100])        self.assertEqual(self.__run_merge([100, 48, 2, 50, 100]), [100, 100, 100])        self.assertEqual(self.__run_merge([100, 100, 67, 1, 10, 1, 21]), [100, 100, 100])        self.assertEqual(self.__run_merge([100, 100, 67, 1, 10, 1, 21, 100, 50, 1, 49]), [100, 100, 100, 100, 100])"
+    }],
+    "scipy_scipy":[{
+        "owner":"scipy",
+        "reponame":"scipy",
+        "target_file":"scipy/optimize/_isotonic.py",
+        "target_class": null,
+        "target_func":"isotonic_regression",
+        "desc":"",
+        "sha":"ed65b675496cb38bf021858d56e32a7d740ca2ea",
+        "prompt":"MAINT: optimize.isotonic_regression: remove unnecessary copies (#20582)reviewed at #20582",
+        "testcases":"import numpy as npfrom numpy.testing import assert_allclose, assert_equalimport pytestfrom scipy.optimize._pava_pybind import pavafrom scipy.optimize import isotonic_regressionclass TestIsotonicRegression:    @pytest.mark.parametrize(        (\"y\", \"w\", \"msg\"),        [            ([[0, 1]], None,             \"array has incorrect number of dimensions: 2; expected 1\"),            ([0, 1], [[1, 2]],             \"Input arrays y and w must have one dimension of equal length\"),            ([0, 1], [1],             \"Input arrays y and w must have one dimension of equal length\"),            (1, 2,            (1, [1, 2],             \"Input arrays y and w must have one dimension of equal length\"),            ([1, 2], 1,             \"Input arrays y and w must have one dimension of equal length\"),            ([0, 1], [0, 1],             \"Weights w must be strictly positive\"),        ]    )    def test_raise_error(self, y, w, msg):        with pytest.raises(ValueError, match=msg):            isotonic_regression(y=y, weights=w)    def test_simple_pava(self):        # Test case of Busing 2020        # https://doi.org/10.18637/jss.v102.c01        y = np.array([8, 4, 8, 2, 2, 0, 8], dtype=np.float64)        w = np.ones_like(y)        r = np.full(shape=y.shape[0] + 1, fill_value=-1, dtype=np.intp)        pava(y, w, r)        assert_allclose(y, [4, 4, 4, 4, 4, 4, 8])        # Only first 2 elements of w are changed.        assert_allclose(w, [6, 1, 1, 1, 1, 1, 1])        # Only first 3 elements of r are changed.        assert_allclose(r, [0, 6, 7, -1, -1, -1, -1, -1])    @pytest.mark.parametrize(\"y_dtype\", [np.float64, np.float32, np.int64, np.int32])    @pytest.mark.parametrize(\"w_dtype\", [np.float64, np.float32, np.int64, np.int32])    @pytest.mark.parametrize(\"w\", [None, \"ones\"])    def test_simple_isotonic_regression(self, w, w_dtype, y_dtype):        # Test case of Busing 2020        # https://doi.org/10.18637/jss.v102.c01        y = np.array([8, 4, 8, 2, 2, 0, 8], dtype=y_dtype)        if w is not None:            w = np.ones_like(y, dtype=w_dtype)        res = isotonic_regression(y, weights=w)        assert res.x.dtype == np.float64        assert res.weights.dtype == np.float64        assert_allclose(res.x, [4, 4, 4, 4, 4, 4, 8])        assert_allclose(res.weights, [6, 1])        assert_allclose(res.blocks, [0, 6, 7])        # Assert that y was not overwritten        assert_equal(y, np.array([8, 4, 8, 2, 2, 0, 8], dtype=np.float64))    @pytest.mark.parametrize(\"increasing\", [True, False])    def test_linspace(self, increasing):        n = 10        y = np.linspace(0, 1, n) if increasing else np.linspace(1, 0, n)        res = isotonic_regression(y, increasing=increasing)        assert_allclose(res.x, y)        assert_allclose(res.blocks, np.arange(n + 1))    def test_weights(self):        w = np.array([1, 2, 5, 0.5, 0.5, 0.5, 1, 3])        y = np.array([3, 2, 1, 10, 9, 8, 20, 10])        res = isotonic_regression(y, weights=w)        assert_allclose(res.x, [12/8, 12/8, 12/8, 9, 9, 9, 50/4, 50/4])        assert_allclose(res.weights, [8, 1.5, 4])        assert_allclose(res.blocks, [0, 3, 6, 8])        # weights are like repeated observations, we repeat the 3rd element 5        # times.        w2 = np.array([1, 2, 1, 1, 1, 1, 1, 0.5, 0.5, 0.5, 1, 3])        y2 = np.array([3, 2, 1, 1, 1, 1, 1, 10, 9, 8, 20, 10])        res2 = isotonic_regression(y2, weights=w2)        assert_allclose(np.diff(res2.x[0:7]), 0)        assert_allclose(res2.x[4:], res.x)        assert_allclose(res2.weights, res.weights)        assert_allclose(res2.blocks[1:] - 4, res.blocks[1:])    def test_against_R_monotone(self):        y = [0, 6, 8, 3, 5, 2, 1, 7, 9, 4]        res = isotonic_regression(y)        # R code        # library(monotone)        # options(digits=8)        # monotone(c(0, 6, 8, 3, 5, 2, 1, 7, 9, 4))        x_R = [            0, 4.1666667, 4.1666667, 4.1666667, 4.1666667, 4.1666667,            4.1666667, 6.6666667, 6.6666667, 6.6666667,        ]        assert_allclose(res.x, x_R)        assert_equal(res.blocks, [0, 1, 7, 10])        n = 100        y = np.linspace(0, 1, num=n, endpoint=False)        y = 5 * y + np.sin(10 * y)        res = isotonic_regression(y)        # R code        # library(monotone)        # n <- 100        # y <- 5 * ((1:n)-1)/n + sin(10 * ((1:n)-1)/n)        # options(digits=8)        # monotone(y)        x_R = [            0.00000000, 0.14983342, 0.29866933, 0.44552021, 0.58941834, 0.72942554,            0.86464247, 0.99421769, 1.11735609, 1.23332691, 1.34147098, 1.44120736,            1.53203909, 1.57081100, 1.57081100, 1.57081100, 1.57081100, 1.57081100,            1.57081100, 1.57081100, 1.57081100, 1.57081100, 1.57081100, 1.57081100,            1.57081100, 1.57081100, 1.57081100, 1.57081100, 1.57081100, 1.57081100,            1.57081100, 1.57081100, 1.57081100, 1.57081100, 1.57081100, 1.57081100,            1.57081100, 1.57081100, 1.57081100, 1.57081100, 1.57081100, 1.57081100,            1.57081100, 1.57081100, 1.57081100, 1.57081100, 1.57081100, 1.57081100,            1.57081100, 1.57081100, 1.57081100, 1.62418532, 1.71654534, 1.81773256,            1.92723551, 2.04445967, 2.16873336, 2.29931446, 2.43539782, 2.57612334,            2.72058450, 2.86783750, 3.01691060, 3.16681390, 3.31654920, 3.46511999,            3.61154136, 3.75484992, 3.89411335, 4.02843976, 4.15698660, 4.27896904,            4.39366786, 4.50043662, 4.59870810, 4.68799998, 4.76791967, 4.83816823,            4.86564130, 4.86564130, 4.86564130, 4.86564130, 4.86564130, 4.86564130,            4.86564130, 4.86564130, 4.86564130, 4.86564130, 4.86564130, 4.86564130,            4.86564130, 4.86564130, 4.86564130, 4.86564130, 4.86564130, 4.86564130,            4.86564130, 4.86564130, 4.86564130, 4.86564130,        ]        assert_allclose(res.x, x_R)        # Test increasing        assert np.all(np.diff(res.x) >= 0)        # Test balance property: sum(y) == sum(x)        assert_allclose(np.sum(res.x), np.sum(y))        # Reverse order        res_inv = isotonic_regression(-y, increasing=False)        assert_allclose(-res_inv.x, res.x)        assert_equal(res_inv.blocks, res.blocks)    def test_readonly(self):        x = np.arange(3, dtype=float)        w = np.ones(3, dtype=float)        x.flags.writeable = False        w.flags.writeable = False        res = isotonic_regression(x, weights=w)        assert np.all(np.isfinite(res.x))        assert np.all(np.isfinite(res.weights))        assert np.all(np.isfinite(res.blocks))    def test_non_contiguous_arrays(self):        x = np.arange(10, dtype=float)[::3]        w = np.ones(10, dtype=float)[::3]        assert not x.flags.c_contiguous        assert not x.flags.f_contiguous        assert not w.flags.c_contiguous        assert not w.flags.f_contiguous        res = isotonic_regression(x, weights=w)        assert np.all(np.isfinite(res.x))        assert np.all(np.isfinite(res.weights))        assert np.all(np.isfinite(res.blocks))"
+    }],
+    "patroni_patroni":[{
+        "owner":"patroni",
+        "reponame":"patroni",
+        "target_file":"patroni/postgresql/rewind.py",
+        "target_class": "Rewind",
+        "target_func":"ensure_checkpoint_after_promote",
+        "desc":"",
+        "sha":"17e523b175d0bb515c0202d52ab11a04faf12d92",
+        "prompt":"Optimize checkpoint after promote (#2114)1. Avoid doing CHECKPOINT if `pg_control` is already updated.2. Explicitly call ensure_checkpoint_after_promote() right after the bootstrap finished successfully.",
+        "testcases":"    def test_ensure_checkpoint_after_promote(self, mock_get_master_timeline, mock_checkpoint, mock_controldata):        mock_controldata.return_value = {\"Latest checkpoint's TimeLineID\": 1}        mock_get_master_timeline.return_value = 1        self.r.ensure_checkpoint_after_promote(Mock())        self.r.reset_state()        mock_controldata.return_value = {\"Latest checkpoint's TimeLineID\": 1}        mock_checkpoint.side_effect = Exception        mock_get_master_timeline.return_value = 2        mock_checkpoint.return_value = 0        self.r.ensure_checkpoint_after_promote(Mock())        self.r.ensure_checkpoint_after_promote(Mock())        self.r.reset_state()        mock_controldata.side_effect = TypeError        self.r.ensure_checkpoint_after_promote(Mock())        mock_checkpoint.side_effect = Exception        self.r.ensure_checkpoint_after_promote(Mock())"
+    }],
+    "librosa_librosa":[{
+        "owner":"librosa",
+        "reponame":"librosa",
+        "target_file":"librosa/core/spectrum.py",
+        "target_class": null,
+        "target_func":"magphase",
+        "desc":"",
+        "sha":"5fdc3b388e863b37fec8a1bf19e216d9096f16a8",
+        "prompt":"Speed up magphase (#1504)* Speed up `magphase`* Set real and imaginary components separately* Use `dtype` parameter to `empty_like`",
+        "testcases":"def test_magphase_zero():    D = np.zeros((128, 128), dtype=np.complex64)    S, P = librosa.magphase(D)    assert S.dtype is np.dtype(\"float32\")    assert P.dtype is np.dtype(\"complex64\")    assert np.allclose(S, 0)    assert np.allclose(P, 1+0j)def test_magphase_denormalized():    D = 1.0e-42j * np.ones((128, 128), dtype=np.complex64)    S, P = librosa.magphase(D)    assert S.dtype is np.dtype(\"float32\")    assert P.dtype is np.dtype(\"complex64\")    assert np.allclose(S, 1.0e-42)    assert np.allclose(P, 0+1j)def test_magphase_real():    D = np.array([[-1.0, -0.0], [0.0, 1.0]], dtype=np.float64)    S, P = librosa.magphase(D)    assert S.dtype is np.dtype(\"float64\")    assert P.dtype is np.dtype(\"complex128\")    assert np.allclose(S, np.array([[1.0, 0.0], [0.0, 1.0]]))    assert np.allclose(        [            [P[0, 0], P[0, 1] ** 2],  # negative zero can have phase +1 or -1            [P[1, 0], P[1, 1]],        ],        np.array([[-1+0j, 1+0j], [1+0j, 1+0j]])    )"
+    }],
+    "encode_django-rest-framework":[{
+        "owner":"encode",
+        "reponame":"django-rest-framework",
+        "target_file":"rest_framework/fields.py",
+        "target_class": null,
+        "target_func":"is_simple_callable",
+        "desc":"",
+        "sha":"281fc074ba255ed9c5724cc971fa86c78d4dca38",
+        "prompt":"",
+        "testcases":""
+    }],
+    "cleanlab_cleanlab":[{
+        "owner":"cleanlab",
+        "reponame":"cleanlab",
+        "target_file":"cleanlab/internal/util.py",
+        "target_class": null,
+        "target_func":"value_counts",
+        "desc":"",
+        "sha":"c13f32a2a6c1d6f3166d760b60f805c94d9f54fe",
+        "prompt":"Optimize value_counts function for performance improvement with missing classes (#1073)Co-authored-by: Elías Snorrason <eliassno@gmail.com>",
+        "testcases":"def test_magphase_zero():    D = np.zeros((128, 128), dtype=np.complex64)    S, P = librosa.magphase(D)    assert S.dtype is np.dtype(\"float32\")    assert P.dtype is np.dtype(\"complex64\")    assert np.allclose(S, 0)    assert np.allclose(P, 1+0j)def test_magphase_denormalized():    D = 1.0e-42j * np.ones((128, 128), dtype=np.complex64)    S, P = librosa.magphase(D)    assert S.dtype is np.dtype(\"float32\")    assert P.dtype is np.dtype(\"complex64\")    assert np.allclose(S, 1.0e-42)    assert np.allclose(P, 0+1j)def test_magphase_real():    D = np.array([[-1.0, -0.0], [0.0, 1.0]], dtype=np.float64)    S, P = librosa.magphase(D)    assert S.dtype is np.dtype(\"float64\")    assert P.dtype is np.dtype(\"complex128\")    assert np.allclose(S, np.array([[1.0, 0.0], [0.0, 1.0]]))    assert np.allclose(        [            [P[0, 0], P[0, 1] ** 2],  # negative zero can have phase +1 or -1            [P[1, 0], P[1, 1]],        ],        np.array([[-1+0j, 1+0j], [1+0j, 1+0j]])    )"
+    },{
+        "owner":"cleanlab",
+        "reponame":"cleanlab",
+        "target_file":"cleanlab/internal/multilabel_utils.py",
+        "target_class": null,
+        "target_func":"onehot2int",
+        "desc":"",
+        "sha":"09fed320f12952d56d16187776cc9ab399a52144",
+        "prompt":"Optimize onehot2int for performance (#1107)",
+        "testcases":"def test_public_label_quality_scores(labels, pred_probs):    formatted_labels = onehot2int(labels)    assert isinstance(formatted_labels, list)    scores1 = ml_classification.get_label_quality_scores(formatted_labels, pred_probs)    assert len(scores1) == len(labels)    assert (scores1 >= 0).all() and (scores1 <= 1).all()    scores2 = ml_classification.get_label_quality_scores(        formatted_labels, pred_probs, method=\"confidence_weighted_entropy\"    )    assert not np.isclose(scores1, scores2).all()    scores3 = ml_classification.get_label_quality_scores(        formatted_labels, pred_probs, adjust_pred_probs=True    )    assert not np.isclose(scores1, scores3).all()    scores4 = ml_classification.get_label_quality_scores(        formatted_labels,        pred_probs,        method=\"normalized_margin\",        adjust_pred_probs=True,        aggregator_kwargs={\"method\": \"exponential_moving_average\"},    )    assert not np.isclose(scores1, scores4).all()    scores5 = ml_classification.get_label_quality_scores(        formatted_labels,        pred_probs,        method=\"normalized_margin\",        adjust_pred_probs=True,        aggregator_kwargs={\"method\": \"softmin\"},    )    assert not np.isclose(scores4, scores5).all()    scores6 = ml_classification.get_label_quality_scores(        formatted_labels,        pred_probs,        method=\"normalized_margin\",        adjust_pred_probs=True,        aggregator_kwargs={\"method\": \"softmin\", \"temperature\": 0.002},    )    assert not np.isclose(scores5, scores6).all()    scores7 = ml_classification.get_label_quality_scores(        formatted_labels,        pred_probs,        method=\"normalized_margin\",        adjust_pred_probs=True,        aggregator_kwargs={\"method\": np.min},    )    assert np.isclose(scores6, scores7, rtol=1e-3).all()    with pytest.raises(ValueError) as e:        _ = ml_classification.get_label_quality_scores(            formatted_labels, pred_probs, method=\"badchoice\"        )        assert \"Invalid method name: badchoice\" in str(e.value)    with pytest.raises(ValueError) as e:        _ = ml_classification.get_label_quality_scores(            formatted_labels, pred_probs, aggregator_kwargs={\"method\": \"invalid\"}        )        assert \"Invalid aggregation method specified: 'invalid'\" in str(e.value)"
+    },{
+        "owner":"cleanlab",
+        "reponame":"cleanlab",
+        "target_file":"cleanlab/internal/multilabel_scorer.py",
+        "target_class": null,
+        "target_func":"multilabel_py",
+        "desc":"",
+        "sha":"f493b9953a0109e678e590f4263395ed4fa11d21",
+        "prompt":"Optimize internal multilabel score"
+    },{
+        "owner":"cleanlab",
+        "reponame":"cleanlab",
+        "target_file":"cleanlab/segmentation/filter.py",
+        "target_class": null,
+        "target_func":"find_label_issues",
+        "desc":"",
+        "sha":"7d1f3350174b280aa5752059e39174098ed33bec",
+        "prompt":"Improve performance of find_label_issues for segmentation"
+    },{
+        "owner":"cleanlab",
+        "reponame":"cleanlab",
+        "target_file":"cleanlab/segmentation/rank.py",
+        "target_class": null,
+        "target_func":"get_label_quality_scores",
+        "desc":"",
+        "sha":"abd0924e619702c52e225cf8de9b52e80b7c66e3",
+        "prompt":"Optimize segmentation/rank.py for performance and maintainability (#1064)Enhanced `get_label_quality_scores` and `issues_from_scores` efficiency, improving execution speed and memory usage."
+    },{
+        "owner":"cleanlab",
+        "reponame":"cleanlab",
+        "target_file":"cleanlab/segmentation/rank.py",
+        "target_class": null,
+        "target_func":"issues_from_scores",
+        "desc":"",
+        "sha":"abd0924e619702c52e225cf8de9b52e80b7c66e3",
+        "prompt":"Optimize segmentation/rank.py for performance and maintainability (#1064)Enhanced `get_label_quality_scores` and `issues_from_scores` efficiency, improving execution speed and memory usage."
+    },{
+        "owner":"cleanlab",
+        "reponame":"cleanlab",
+        "target_file":"cleanlab/rank.py",
+        "target_class": null,
+        "target_func":"get_normalized_margin_for_each_label",
+        "desc":"",
+        "sha":"6d45971cf83ccc85ac31d2591c54ce6b52a27281",
+        "prompt":"List comprehension to numpy ops for efficiency"
+    }],
+    "albumentations-team_albumentations":[{
+        "owner":"albumentations-team",
+        "reponame":"albumentations",
+        "target_file":"albumentations/augmentations/functional.py",
+        "target_class": null,
+        "target_func":"brightness_contrast_adjust",
+        "desc":"这个数据不好，待删除",
+        "sha":"905d63a99af277a74b797f485bdebf9d7e1ea712",
+        "prompt":"",
+        "testcases":""
+    }],
+    "optuna_optuna":[{
+        "owner":"optuna",
+        "reponame":"optuna",
+        "target_file":"optuna/study/_multi_objective.py",
+        "target_class": null,
+        "target_func":"_calculate_nondomination_rank",
+        "desc":"",
+        "sha":"c47870fd9018b0dcac0891c68addfb6e77138b56",
+        "prompt":"Merge speed-up-nondominated-sort",
+        "testcases":"def test_fast_non_domination_rank(trial_values: list[float], trial_ranks: list[int]) -> None:    ranks = list(_fast_non_domination_rank(np.array(trial_values)))    assert np.array_equal(ranks, trial_ranks)def test_fast_non_domination_rank_invalid() -> None:    with pytest.raises(ValueError):        _fast_non_domination_rank(            np.array([[1.0, 2.0], [3.0, 4.0]]), penalty=np.array([1.0, 2.0, 3.0])        )"
+    },{
+        "owner":"optuna",
+        "reponame":"optuna",
+        "target_file":"optuna/_hypervolume/hssp.py",
+        "target_class": null,
+        "target_func":"_solve_hssp",
+        "desc":"",
+        "sha":"fd09877846e4a3aa4ff26125db9d8a466eaf0965",
+        "prompt":"Merge pull request #5355 from nabenabe0928/enhance/make-hv-contrib-calculation-lazyMake HV calculations in HSSP lazy to speed up"
+    },{
+        "owner":"optuna",
+        "reponame":"optuna",
+        "target_file":"optuna/_hypervolume/wfg.py",
+        "target_class": null,
+        "target_func":"compute_hypervolume",
+        "desc":"",
+        "sha":"3743c51d3bea9df111030259c9a13d265618038a",
+        "prompt":"Merge pull request #5591 from nabenabe0928/enhance/add-more-explanation-to-hypervolume-related-funcsSpeed up WFG by using a fact that hypervolume calculation does not need (second or later) duplicated Pareto solutions"
+    },{
+        "owner":"optuna",
+        "reponame":"optuna",
+        "target_file":"optuna/_hypervolume/wfg.py",
+        "target_class": null,
+        "target_func":"compute_hypervolume",
+        "desc":"",
+        "sha":"99b9e41bbec8ae020131686d6bc51a1f26ac84f7",
+        "prompt":"Speed up WFG by using a fact that limited_sols do not need to be unique"
+    },{
+        "owner":"optuna",
+        "reponame":"optuna",
+        "target_file":"optuna/_hypervolume/hssp.py",
+        "target_class": null,
+        "target_func":"_solve_hssp",
+        "desc":"",
+        "sha":"e2b299176f86c23e149a6f4dd223fc4df8a43446",
+        "prompt":"Merge pull request #5346 from nabenabe0928/enhance/speed-up-hssp-2dReduce the time complexity of HSSP 2d from `O(NK^2 log K)` to `O((N - K)K)`"
+    },{
+        "owner":"optuna",
+        "reponame":"optuna",
+        "target_file":"optuna/distributions.py",
+        "target_class": "CategoricalDistribution",
+        "target_func":"to_internal_repr",
+        "desc":"",
+        "sha":"89b0fd16e811d8ca57a2c1d3d6d13e55117c37b0",
+        "prompt":"Merge pull request #5400 from nabenabe0928/enhance/speed-up-to-internal-repr-in-categorical-distSpeed up `to_internal_repr` in `CategoricalDistribution`"
+    },{
+        "owner":"optuna",
+        "reponame":"optuna",
+        "target_file":"optuna/_hypervolume/hssp.py",
+        "target_class": null,
+        "target_func":"_solve_hssp", 
+        "desc":"",
+        "sha":"e75b8763492d5ce4ce2c231044eed8d04498fd25",
+        "prompt":"Make HV calculations in HSSP lazy to speed up"
+    },{
+        "owner":"optuna",
+        "reponame":"optuna",
+        "target_file":"optuna/_hypervolume/hssp.py",
+        "target_class": null,
+        "target_func":"_solve_hssp",
+        "desc":"",
+        "sha":"4cd22727138800425ec6067d3de6b9b28da04f79",
+        "prompt":"Enhance the time complexity further"
+    },{
+        "owner":"optuna",
+        "reponame":"optuna",
+        "target_file":"optuna/_hypervolume/utils.py",
+        "target_class": null,
+        "target_func":"_compute_2d",
+        "desc":"",
+        "sha":"b84f7b6a776f0d4029b8db3d84fa3a1ec86946ad",
+        "prompt":"Merge pull request #5303 from nabenabe0928/enhance/speedup-2d-hv-computationMake 2d HV computation twice faster"
+    }],
+    "google_yapf":[{
+        "owner":"google",
+        "reponame":"yapf",
+        "target_file":"yapf/yapflib/file_resources.py",
+        "target_class": null,
+        "target_func":"_FindPythonFiles",
+        "desc":"",
+        "sha":"3718f22ca663d6346525b12c0995cf78e920299d",
+        "prompt":"Merge pull request #510 from caioariede/caioariede/exclude-files-earlierPerformance improvement: Exclude files earlier",
+        "testcases":"class GetCommandLineFilesTest(unittest.TestCase):  def setUp(self):    self.test_tmpdir = tempfile.mkdtemp()    self.old_dir = os.getcwd()  def tearDown(self):    shutil.rmtree(self.test_tmpdir)    os.chdir(self.old_dir)  def _make_test_dir(self, name):    fullpath = os.path.normpath(os.path.join(self.test_tmpdir, name))    os.makedirs(fullpath)    return fullpath  def test_find_files_not_dirs(self):    tdir1 = self._make_test_dir('test1')    tdir2 = self._make_test_dir('test2')    file1 = os.path.join(tdir1, 'testfile1.py')    file2 = os.path.join(tdir2, 'testfile2.py')    _touch_files([file1, file2])    self.assertEqual(        file_resources.GetCommandLineFiles(            [file1, file2], recursive=False, exclude=None), [file1, file2])    self.assertEqual(        file_resources.GetCommandLineFiles(            [file1, file2], recursive=True, exclude=None), [file1, file2])  def test_nonrecursive_find_in_dir(self):    tdir1 = self._make_test_dir('test1')    tdir2 = self._make_test_dir('test1/foo')    file1 = os.path.join(tdir1, 'testfile1.py')    file2 = os.path.join(tdir2, 'testfile2.py')    _touch_files([file1, file2])    self.assertRaises(        errors.YapfError,        file_resources.GetCommandLineFiles,        command_line_file_list=[tdir1],        recursive=False,        exclude=None)  def test_recursive_find_in_dir(self):    tdir1 = self._make_test_dir('test1')    tdir2 = self._make_test_dir('test2/testinner/')    tdir3 = self._make_test_dir('test3/foo/bar/bas/xxx')    files = [        os.path.join(tdir1, 'testfile1.py'),        os.path.join(tdir2, 'testfile2.py'),        os.path.join(tdir3, 'testfile3.py'),    ]    _touch_files(files)    self.assertEqual(        sorted(            file_resources.GetCommandLineFiles(                [self.test_tmpdir], recursive=True, exclude=None)),        sorted(files))  def test_recursive_find_in_dir_with_exclude(self):    tdir1 = self._make_test_dir('test1')    tdir2 = self._make_test_dir('test2/testinner/')    tdir3 = self._make_test_dir('test3/foo/bar/bas/xxx')    files = [        os.path.join(tdir1, 'testfile1.py'),        os.path.join(tdir2, 'testfile2.py'),        os.path.join(tdir3, 'testfile3.py'),    ]    _touch_files(files)    self.assertEqual(        sorted(            file_resources.GetCommandLineFiles(                [self.test_tmpdir], recursive=True, exclude=['*test*3.py'])),        sorted([            os.path.join(tdir1, 'testfile1.py'),            os.path.join(tdir2, 'testfile2.py'),        ]))  def test_find_with_excluded_dirs(self):    tdir1 = self._make_test_dir('test1')    tdir2 = self._make_test_dir('test2/testinner/')    tdir3 = self._make_test_dir('test3/foo/bar/bas/xxx')    files = [        os.path.join(tdir1, 'testfile1.py'),        os.path.join(tdir2, 'testfile2.py'),        os.path.join(tdir3, 'testfile3.py'),    ]    _touch_files(files)    os.chdir(self.test_tmpdir)    found = sorted(        file_resources.GetCommandLineFiles(            ['test1', 'test2', 'test3'],            recursive=True,            exclude=[                'test1',                'test2/testinner/',            ]))    self.assertEqual(found, ['test3/foo/bar/bas/xxx/testfile3.py'])    found = sorted(        file_resources.GetCommandLineFiles(            ['.'], recursive=True, exclude=[                'test1',                'test3',            ]))    self.assertEqual(found, ['./test2/testinner/testfile2.py'])  def test_find_with_excluded_current_dir(self):    with self.assertRaises(errors.YapfError):      file_resources.GetCommandLineFiles([], False, exclude=['./z'])"
+    },{
+        "owner":"google",
+        "reponame":"yapf",
+        "target_file":"yapf/yapflib/format_decision_state.py",
+        "target_class": "FormatDecisionState",
+        "target_func":"Clone",
+        "desc":"",
+        "sha":"5a1e3314b63b9e405020edd886e79de35bf93ab1",
+        "prompt":"Improve performance of FormatDecisionState object copying",
+        "testcases":"class FormatDecisionStateTest(yapf_test_helper.YAPFTest):  @classmethod  def setUpClass(cls):    style.SetGlobalStyle(style.CreateChromiumStyle())  def testSimpleFunctionDefWithNoSplitting(self):    code = textwrap.dedent(r\"\"\"      def f(a, b):        pass      \"\"\")    uwlines = yapf_test_helper.ParseAndUnwrap(code)    uwline = unwrapped_line.UnwrappedLine(0, _FilterLine(uwlines[0]))    uwline.CalculateFormattingInformation()    # Add: 'f'    state = format_decision_state.FormatDecisionState(uwline, 0)    state.MoveStateToNextToken()    self.assertEqual('f', state.next_token.value)    self.assertFalse(state.CanSplit(False))    # Add: '('    state.AddTokenToState(False, True)    self.assertEqual('(', state.next_token.value)    self.assertFalse(state.CanSplit(False))    self.assertFalse(state.MustSplit())    # Add: 'a'    state.AddTokenToState(False, True)    self.assertEqual('a', state.next_token.value)    self.assertTrue(state.CanSplit(False))    self.assertFalse(state.MustSplit())    # Add: ','    state.AddTokenToState(False, True)    self.assertEqual(',', state.next_token.value)    self.assertFalse(state.CanSplit(False))    self.assertFalse(state.MustSplit())    # Add: 'b'    state.AddTokenToState(False, True)    self.assertEqual('b', state.next_token.value)    self.assertTrue(state.CanSplit(False))    self.assertFalse(state.MustSplit())    # Add: ')'    state.AddTokenToState(False, True)    self.assertEqual(')', state.next_token.value)    self.assertTrue(state.CanSplit(False))    self.assertFalse(state.MustSplit())    # Add: ':'    state.AddTokenToState(False, True)    self.assertEqual(':', state.next_token.value)    self.assertFalse(state.CanSplit(False))    self.assertFalse(state.MustSplit())    clone = copy.copy(state)    self.assertEqual(repr(state), repr(clone))  def testSimpleFunctionDefWithSplitting(self):    code = textwrap.dedent(r\"\"\"      def f(a, b):        pass      \"\"\")    uwlines = yapf_test_helper.ParseAndUnwrap(code)    uwline = unwrapped_line.UnwrappedLine(0, _FilterLine(uwlines[0]))    uwline.CalculateFormattingInformation()    # Add: 'f'    state = format_decision_state.FormatDecisionState(uwline, 0)    state.MoveStateToNextToken()    self.assertEqual('f', state.next_token.value)    self.assertFalse(state.CanSplit(False))    # Add: '('    state.AddTokenToState(True, True)    self.assertEqual('(', state.next_token.value)    self.assertFalse(state.CanSplit(False))    # Add: 'a'    state.AddTokenToState(True, True)    self.assertEqual('a', state.next_token.value)    self.assertTrue(state.CanSplit(False))    # Add: ','    state.AddTokenToState(True, True)    self.assertEqual(',', state.next_token.value)    self.assertFalse(state.CanSplit(False))    # Add: 'b'    state.AddTokenToState(True, True)    self.assertEqual('b', state.next_token.value)    self.assertTrue(state.CanSplit(False))    # Add: ')'    state.AddTokenToState(True, True)    self.assertEqual(')', state.next_token.value)    self.assertTrue(state.CanSplit(False))    # Add: ':'    state.AddTokenToState(True, True)    self.assertEqual(':', state.next_token.value)    self.assertFalse(state.CanSplit(False))    clone = copy.copy(state)    self.assertEqual(repr(state), repr(clone))def _FilterLine(uwline):  \"\"\"Filter out nonsemantic tokens from the UnwrappedLines.\"\"\"  return [      ft for ft in uwline.tokens      if ft.name not in pytree_utils.NONSEMANTIC_TOKENS  ]"
+    },{
+        "owner":"google",
+        "reponame":"yapf",
+        "target_file":"yapf/yapflib/reformatter.py",
+        "target_class": null,
+        "target_func":"Reformat",
+        "desc":"",
+        "sha":"1f9c37abda6126ea07c5f2a33a8eb4c63d662e2a",
+        "prompt":"Merge pull request #259 from ppolewicz/performance Performance optimization"
+    },{
+        "owner":"google",
+        "reponame":"yapf",
+        "target_file":"yapf/yapflib/format_decision_state.py",
+        "target_class": null,
+        "target_func":"Clone",
+        "desc":"",
+        "sha":"55072421f369daba593b6d8c87049b6376a1a862",
+        "prompt":"Use list comprehension instead of deepcopy to speed up Clone(), this gives a total of 25% performance boost on yapf tree and a 50% boost on whylog tree"
+    }],
+    "arrow-py_arrow":[{
+        "owner":"arrow-py",
+        "reponame":"arrow",
+        "target_file":"arrow/parser.py",
+        "target_class": "DateTimeParser",
+        "target_func":"parse",
+        "desc":"",
+        "sha":"4996bc9422a89ddeaa45d05f25c750d893db4667",
+        "prompt":"Merge pull request #382 from ownaginatious/cached_parsingCached compiled format strings to speed up repetitive parsing. Upgrade chai and python-dateutil Thanks @ownaginatious",
+        "testcases":"class DateTimeParserParseTests(Chai):    def setUp(self):        super(DateTimeParserParseTests, self).setUp()        self.parser = parser.DateTimeParser()    def test_parse_list(self):        expect(self.parser._parse_multiformat).args('str', ['fmt_a', 'fmt_b']).returns('result')        result = self.parser.parse('str', ['fmt_a', 'fmt_b'])        assertEqual(result, 'result')    def test_parse_unrecognized_token(self):        mock_input_re_map = mock(self.parser, '_input_re_map')        expect(mock_input_re_map.__getitem__).args('YYYY').raises(KeyError)        with assertRaises(parser.ParserError):            self.parser.parse('2013-01-01', 'YYYY-MM-DD')    def test_parse_parse_no_match(self):        with assertRaises(parser.ParserError):            self.parser.parse('01-01', 'YYYY-MM-DD')    def test_parse_separators(self):        with assertRaises(parser.ParserError):            self.parser.parse('1403549231', 'YYYY-MM-DD')    def test_parse_numbers(self):        expected = datetime(2012, 1, 1, 12, 5, 10)        assertEqual(self.parser.parse('2012-01-01 12:05:10', 'YYYY-MM-DD HH:mm:ss'), expected)    def test_parse_year_two_digit(self):        expected = datetime(1979, 1, 1, 12, 5, 10)        assertEqual(self.parser.parse('79-01-01 12:05:10', 'YY-MM-DD HH:mm:ss'), expected)    def test_parse_timestamp(self):        tz_utc = tz.tzutc()        timestamp = int(time.time())        expected = datetime.fromtimestamp(timestamp, tz=tz_utc)        assertEqual(self.parser.parse(str(timestamp), 'X'), expected)    def test_parse_names(self):        expected = datetime(2012, 1, 1)        assertEqual(self.parser.parse('January 1, 2012', 'MMMM D, YYYY'), expected)        assertEqual(self.parser.parse('Jan 1, 2012', 'MMM D, YYYY'), expected)    def test_parse_pm(self):        expected = datetime(1, 1, 1, 13, 0, 0)        assertEqual(self.parser.parse('1 pm', 'H a'), expected)        assertEqual(self.parser.parse('1 pm', 'h a'), expected)        expected = datetime(1, 1, 1, 1, 0, 0)        assertEqual(self.parser.parse('1 am', 'H A'), expected)        assertEqual(self.parser.parse('1 am', 'h A'), expected)        expected = datetime(1, 1, 1, 0, 0, 0)        assertEqual(self.parser.parse('12 am', 'H A'), expected)        assertEqual(self.parser.parse('12 am', 'h A'), expected)        expected = datetime(1, 1, 1, 12, 0, 0)        assertEqual(self.parser.parse('12 pm', 'H A'), expected)        assertEqual(self.parser.parse('12 pm', 'h A'), expected)    def test_parse_tz_hours_only(self):        expected = datetime(2025, 10, 17, 5, 30, 10, tzinfo=tz.tzoffset(None, 0))        parsed = self.parser.parse('2025-10-17 05:30:10+00', 'YYYY-MM-DD HH:mm:ssZ')        assertEqual(parsed, expected)    def test_parse_tz_zz(self):        expected = datetime(2013, 1, 1, tzinfo=tz.tzoffset(None, -7 * 3600))        assertEqual(self.parser.parse('2013-01-01 -07:00', 'YYYY-MM-DD ZZ'), expected)    def test_parse_tz_name_zzz(self):        for tz_name in (            # best solution would be to test on every available tz name from            # the tz database but it is actualy tricky to retrieve them from            # dateutil so here is short list that should match all            # naming patterns/conventions in used tz databaze            'Africa/Tripoli',            'America/Port_of_Spain',            'Australia/LHI',            'Etc/GMT-11',            'Etc/GMT0',            'Etc/UCT',            'Etc/GMT+9',            'GMT+0',            'CST6CDT',            'GMT-0',            'W-SU',        ):            expected = datetime(2013, 1, 1, tzinfo=tz.gettz(tz_name))            assertEqual(self.parser.parse('2013-01-01 %s' % tz_name, 'YYYY-MM-DD ZZZ'), expected)        # note that offsets are not timezones        with assertRaises(ParserError):            self.parser.parse('2013-01-01 +1000', 'YYYY-MM-DD ZZZ')    def test_parse_subsecond(self):        expected = datetime(2013, 1, 1, 12, 30, 45, 900000)        assertEqual(self.parser.parse('2013-01-01 12:30:45.9', 'YYYY-MM-DD HH:mm:ss.S'), expected)        assertEqual(self.parser.parse_iso('2013-01-01 12:30:45.9'), expected)        expected = datetime(2013, 1, 1, 12, 30, 45, 980000)        assertEqual(self.parser.parse('2013-01-01 12:30:45.98', 'YYYY-MM-DD HH:mm:ss.SS'), expected)        assertEqual(self.parser.parse_iso('2013-01-01 12:30:45.98'), expected)        expected = datetime(2013, 1, 1, 12, 30, 45, 987000)        assertEqual(self.parser.parse('2013-01-01 12:30:45.987', 'YYYY-MM-DD HH:mm:ss.SSS'), expected)        assertEqual(self.parser.parse_iso('2013-01-01 12:30:45.987'), expected)        expected = datetime(2013, 1, 1, 12, 30, 45, 987600)        assertEqual(self.parser.parse('2013-01-01 12:30:45.9876', 'YYYY-MM-DD HH:mm:ss.SSSS'), expected)        assertEqual(self.parser.parse_iso('2013-01-01 12:30:45.9876'), expected)        expected = datetime(2013, 1, 1, 12, 30, 45, 987650)        assertEqual(self.parser.parse('2013-01-01 12:30:45.98765', 'YYYY-MM-DD HH:mm:ss.SSSSS'), expected)        assertEqual(self.parser.parse_iso('2013-01-01 12:30:45.98765'), expected)        expected = datetime(2013, 1, 1, 12, 30, 45, 987654)        assertEqual(self.parser.parse('2013-01-01 12:30:45.987654', 'YYYY-MM-DD HH:mm:ss.SSSSSS'), expected)        assertEqual(self.parser.parse_iso('2013-01-01 12:30:45.987654'), expected)    def test_parse_subsecond_rounding(self):        expected = datetime(2013, 1, 1, 12, 30, 45, 987654)        format = 'YYYY-MM-DD HH:mm:ss.S'        # round up        string = '2013-01-01 12:30:45.9876539'        assertEqual(self.parser.parse(string, format), expected)        assertEqual(self.parser.parse_iso(string), expected)        # round down        string = '2013-01-01 12:30:45.98765432'        assertEqual(self.parser.parse(string, format), expected)        #import pudb; pudb.set_trace()        assertEqual(self.parser.parse_iso(string), expected)        # round half-up        string = '2013-01-01 12:30:45.987653521'        assertEqual(self.parser.parse(string, format), expected)        assertEqual(self.parser.parse_iso(string), expected)        # round half-down        string = '2013-01-01 12:30:45.9876545210'        assertEqual(self.parser.parse(string, format), expected)        assertEqual(self.parser.parse_iso(string), expected)    def test_map_lookup_keyerror(self):        with assertRaises(parser.ParserError):            parser.DateTimeParser._map_lookup({'a': '1'}, 'b')    def test_try_timestamp(self):        assertEqual(parser.DateTimeParser._try_timestamp('1.1'), 1.1)        assertEqual(parser.DateTimeParser._try_timestamp('1'), 1)        assertEqual(parser.DateTimeParser._try_timestamp('abc'), None)"
+    }],
+    "mkdocs_mkdocs":[{
+        "owner":"mkdocs",
+        "reponame":"mkdocs",
+        "target_file":"mkdocs/structure/files.py",
+        "target_class": null,
+        "target_func":"__init__",
+        "desc":"",
+        "sha":"0b5ef68184c549251ca432934663ad82fe842b39",
+        "prompt":"Make fields of File computed on demandThe previous attempt always computed these on the fly #3017but now they will be cached after first access, so the performance penalty is avoided.The fields can still be overwritten manually.And one can ask the fields to be recomputed by using the `del` operation.",
+        "testcases":"    def test_file_overwrite_attrs(self):        f = File('foo.md', '/path/to/docs', '/path/to/site', use_directory_urls=False)        self.assertEqual(f.src_uri, 'foo.md')        self.assertPathsEqual(f.abs_src_path, '/path/to/docs/foo.md')        f.abs_src_path = '/tmp/foo.md'        self.assertPathsEqual(f.abs_src_path, '/tmp/foo.md')        del f.abs_src_path        self.assertPathsEqual(f.abs_src_path, '/path/to/docs/foo.md')        f.dest_uri = 'a.html'        self.assertPathsEqual(f.abs_dest_path, '/path/to/site/a.html')        self.assertEqual(f.url, 'a.html')        f.abs_dest_path = '/path/to/site/b.html'        self.assertPathsEqual(f.abs_dest_path, '/path/to/site/b.html')        self.assertEqual(f.url, 'a.html')        del f.url        del f.dest_uri        del f.abs_dest_path        self.assertPathsEqual(f.abs_dest_path, '/path/to/site/foo.html')        self.assertTrue(f.is_documentation_page())        f.src_uri = 'foo.html'        del f.name        self.assertFalse(f.is_documentation_page())"
+    },{
+        "owner":"mkdocs",
+        "reponame":"mkdocs",
+        "target_file":"mkdocs/contrib/search/search_index.py",
+        "target_class": "SearchIndex",
+        "target_func":"add_entry_from_context",
+        "desc":"",
+        "sha":"d094c932d33adc44c249e8f547bd32b02a65feb8",
+        "prompt":"search: Merge two HTML parsers into oneThis improves performance, as HTML of each page doesn't need to be parsed twice.",
+        "testcases":"    def test_content_parser(self):        parser = search_index.ContentParser()        parser.feed('<h1 id=\"title\">Title</h1>TEST')        parser.close()        self.assertEqual(parser.data, [search_index.ContentSection(            text=[\"TEST\"],            id_=\"title\",            title=\"Title\"        )])    def test_content_parser_no_id(self):        parser = search_index.ContentParser()        parser.feed(\"<h1>Title</h1>TEST\")        parser.close()        self.assertEqual(parser.data, [search_index.ContentSection(            text=[\"TEST\"],            id_=None,            title=\"Title\"        )])    def test_content_parser_content_before_header(self):        parser = search_index.ContentParser()        parser.feed(\"Content Before H1 <h1>Title</h1>TEST\")        parser.close()        self.assertEqual(parser.data, [search_index.ContentSection(            text=[\"TEST\"],            id_=None,            title=\"Title\"        )])    def test_content_parser_no_sections(self):        parser = search_index.ContentParser()        parser.feed(\"No H1 or H2<span>Title</span>TEST\")        self.assertEqual(parser.data, [])"
+    }],
+    "ranaroussi_yfinance":[{
+        "owner":"ranaroussi",
+        "reponame":"yfinance",
+        "target_file":"yfinance/base.py",
+        "target_class": "TickerBase",
+        "target_func":"_get_ticker_tz",
+        "desc":"",
+        "sha":"6253e1d8a015db3f2b0e17a29300307d730d70be",
+        "prompt":"Merge pull request #1112 from ranaroussi/fix/get-tz-performanceImprove performance of fetching Ticker timezone",
+        "testcases":"class TestTicker(unittest.TestCase):defsetUp(self):passdef tearDown(self):pass def test_getTz(self):tkrs = []tkrs.append(\"IMP.JO\")tkrs.append(\"BHG.JO\")tkrs.append(\"SSW.JO\")tkrs.append(\"BP.L\")tkrs.append(\"INTC\")test_run = Falsefor tkr in tkrs:# First step: remove ticker from tz-cacheyf.utils.tz_cache.store(tkr, None)# Test:dat = yf.Ticker(tkr)tz = dat._get_ticker_tz(debug_mode=False, proxy=None, timeout=None)elf.assertIsNotNone(tz)"
+    }],
+    "networkx_networkx":[{
+        "owner":"networkx",
+        "reponame":"networkx",
+        "target_file":"networkx/classes/function.py",
+        "target_class": null,
+        "target_func":"non_neighbors",
+        "desc":"",
+        "sha":"72d1f680f60213102df1ab07c5eef82605944594",
+        "prompt":"ENH: Speed up common/non_neighbors by using _adj dict operations (#7244)* ENH: Speed up common_neighbors by using _adj dict operations* Speed up non_neighbors* need for speed* Update networkx/classes/function.pyCo-authored-by: Dan Schult <dschult@colgate.edu>* Update networkx/algorithms/link_prediction.pyCo-authored-by: Dan Schult <dschult@colgate.edu>* Add benchmarks for non_neighbors.* Add benchmarks for common_neighbors.",
+        "testcases":"    def test_non_neighbors(self):        graph = nx.complete_graph(100)        pop = random.sample(list(graph), 1)        nbors = list(nx.non_neighbors(graph, pop[0]))        nbors = nx.non_neighbors(graph, pop[0])        # should be all the other vertices in the graph        assert len(nbors) == 0        graph = nx.path_graph(100)        node = random.sample(list(graph), 1)[0]        nbors = list(nx.non_neighbors(graph, node))        nbors = nx.non_neighbors(graph, node)        # should be all the other vertices in the graph        if node != 0 and node != 99:            assert len(nbors) == 97@@ -317,13 +317,13 @@ def test_non_neighbors(self):        # create a star graph with 99 outer nodes        graph = nx.star_graph(99)        nbors = list(nx.non_neighbors(graph, 0))        nbors = nx.non_neighbors(graph, 0)        assert len(nbors) == 0        # disconnected graph        graph = nx.Graph()        graph.add_nodes_from(range(10))        nbors = list(nx.non_neighbors(graph, 0))        nbors = nx.non_neighbors(graph, 0)        assert len(nbors) == 9"
+    },{
+        "owner":"networkx",
+        "reponame":"networkx",
+        "target_file":"networkx/algorithms/components/weakly_connected.py",
+        "target_class": null,
+        "target_func":"weakly_connected_components",
+        "desc":"",
+        "sha":"2516c15a82fbf8486db4a6dfc43a5fa54d653d8c",
+        "prompt":"Fix weakly_connected_components() performance on graph view (#7586)* Fix weakly_connected_components() performance* Applied the same fix for connected.py"
+    },{
+        "owner":"networkx",
+        "reponame":"networkx",
+        "target_file":"networkx/algorithms/shortest_paths/astar.py",
+        "target_class": null,
+        "target_func":"astar_path",
+        "desc":"",
+        "sha":"f1d68e5845ed8a736fafb212adf52f303bfbb1fb",
+        "prompt":"Performance improvement for astar_path"
+    },{
+        "owner":"networkx",
+        "reponame":"networkx",
+        "target_file":"networkx/algorithms/components/connected.py",
+        "target_class": null,
+        "target_func":"_plain_bfs",
+        "desc":"",
+        "sha":"8acb5d18a02132074d98d0cc5dd1ef131ce310aa",
+        "prompt":"Optimize _plain_bfs functions (#6340)* Optimize _plain_bfs function* change code also for _plain_bfs in connected.py* Update weakly_connected.py* Update connected.py* Update connected.py* Update weakly_connected.py"
+    },{
+        "owner":"networkx",
+        "reponame":"networkx",
+        "target_file":"networkx/algorithms/traversal/breadth_first_search.py",
+        "target_class": null,
+        "target_func":"bfs_edges",
+        "desc":"",
+        "sha":"f011cd4826117a242fb3d38527f967e98964e948",
+        "prompt":"optimize generic_bfs_edges function (#6359)* optimize generic_bfs_edges function* Update breadth_first_search.py* Update breadth_first_search.py* Update breadth_first_search.py"
+    },{
+        "owner":"networkx",
+        "reponame":"networkx",
+        "target_file":"networkx/algorithms/shortest_paths/unweighted.py",
+        "target_class": null,
+        "target_func":"single_target_shortest_path_length",
+        "desc":"",
+        "sha":"4a2bcaaa5c19408aff6e6945b7db24e58cbeb3e1",
+        "prompt":"Optimize _single_shortest_path_length function (#6299)* Optimize _single_shortest_path_length function* Update unweighted.py"
+    },{
+        "owner":"networkx",
+        "reponame":"networkx",
+        "target_file":"networkx/algorithms/components/biconnected.py",
+        "target_class": null,
+        "target_func":"_biconnected_dfs",
+        "desc":"",
+        "sha":"6662dd6d6cbaf9928bc9ccc37756f6d6fc992337",
+        "prompt":"Enhance biconnected components to avoid indexing (#5974)* index costs the size of the stack, which is always greater than or equal to the size of the newly discovered biconnnected component, and in general much larger.Instead, introduce a dict that maps the edge to an index instead of using the list.index method on the full stack.Co-authored-by: Kelly Boothby <boothby@dwavesys.com>"
+    },{
+        "owner":"networkx",
+        "reponame":"networkx",
+        "target_file":"networkx/algorithms/tree/mst.py",
+        "target_class": null,
+        "target_func":"prim_mst_edges",
+        "desc":"",
+        "sha":"83cc6cd2811dbc6d20cfb3de809f21153b30e14e",
+        "prompt":"Optimize prim for mst"
+    }],
+    "unit8co_darts":[{
+        "owner":"unit8co",
+        "reponame":"darts",
+        "target_file":"darts/timeseries.py",
+        "target_class": "TimeSeries",
+        "target_func":"quantiles_df",
+        "desc":"",
+        "sha":"ec78594e924afa10da6bab17e232a5ffc6e7646",
+        "prompt":"Quantiles_df method speed optimization with wrap class of Quantile_timeseries (#1351)* Optimisation for quantiles_df using wrap of quantile_timeseries method* sync with actual repo* fix empty space* Fix mistake Fix mistake with bool toggle* Modify quantiles_df method for using quantile_timeseries as main way to estimate result* Add unit test for quantiles_df method",
+        "testcases":"    def test_quantiles_df(self):        q = (0.01, 0.1, 0.5, 0.95)        values = np.random.rand(10, 1, 1000)        ar = xr.DataArray(            values,            dims=(\"time\", \"component\", \"sample\"),            coords={\"time\": self.times, \"component\": [\"a\"]},        )        ts = TimeSeries(ar)        q_ts = ts.quantiles_df(q)        for col in q_ts:            q = float(str(col).replace(\"a_\", \"\"))            self.assertTrue(                abs(                    q_ts[col].to_numpy().reshape(10, 1)                    - np.quantile(values, q=q, axis=2)                    < 1e-3                ).all()            )"
+    }]
+
+}
