@@ -2,12 +2,6 @@
 
 Each folder contains a github python repository named reponame
 
-```shell
-since there are too much repo info, detail can be https://drive.google.com/drive/folders/1Jf6ZYquxikgkz82DECiGDy2b8AFJadis
-```
-
-
-
 #### venv_python
 
 Each folder holds a virtual environment for each python repository, named owner_reponame
