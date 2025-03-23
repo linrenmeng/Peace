@@ -15,6 +15,8 @@ This repository contains the project-level PEACExec, training and evaluation cod
 
 **Fig. 1** shows the overall framework of PEACE, which aims to opti-mize a target function and ensure the correctness and integrity of the overall project at the same time. To achieve this goal, PEACE first analyzes code contexts to construct an optimizing function se-quence to edit, and then identify valid associated edits. After that, it leverages valid associate edits along with both internal and externalhigh-performance functions to iteratively optimize the functionsin the optimizing function sequence. Specifically, PEACE containsthree main phases: Dependency-Aware Optimizing Function Se-quence Construction (Phase I),Valid Associated Edits Identification(Phase II), and Performance Editing Iteration (Phase III).
 
+
+
 ## Dependency
 
 Python == 3.10.14
@@ -39,20 +41,25 @@ pip install -r requirements.txt
 
 \denpendAnalysisTool
 
+```
+denpendAnalysisTool is the dependency analysis tool, the model parameter file is given
+```
+
 \peace
+
+```
+PEACE is a framework for repo level code performance optimization that requires manual API configuration while training models to complete the preparation of the framework
+```
 
 \docker
 
-See the respective README.md for details on each file. 
+```
+PEACExec is a repo level code performance benchmark, all running environments are configured in docker
+```
 
 
 
-## Logging
+#### More detail and usage can be see in the respective README.md on each file. 
 
-2025-3-14: source code,experiment results, data will be prepared and upload in few days.
 
-2025-3-15: update PEACE, ValidAssociatedEdit
 
-2025-3-18: update DenpendAnalysisTool 
-
-2025-3-20: update docker/ data, before_repo_python
