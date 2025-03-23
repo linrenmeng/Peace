@@ -3,7 +3,7 @@
 Each folder contains a github python repository named reponame
 
 ```
-since too much large repo, detail can be find in https://drive.google.com/drive/folders/1Jf6ZYquxikgkz82DECiGDy2b8AFJadis?usp=sharing 
+since too much large repo, detail can be find in https://mega.nz/folder/bGYHlKRQ#tZIyXJgEnt5o1662miifMQ
 ```
 
 
