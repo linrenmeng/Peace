@@ -1,0 +1,4 @@
+The `performanceOptimizer`  is designed for fine-tuning a large language model (specifically, the Meta's LLaMA 3 8B model) to optimize code snippets based on execution speed. It uses the Low-Rank Adaptation (LoRA) technique for efficient fine-tuning, making it possible to adapt the pre-trained model to the specific task of code performance analysis with relatively low computational resources.
+
+- `finetuning.py`: The main script for fine-tuning the model. It contains all the necessary steps from data loading to model training and inference.
+- `data/`: A directory that stores the fine-tuning data. 
