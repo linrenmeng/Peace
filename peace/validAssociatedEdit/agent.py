@@ -121,7 +121,7 @@ def send_to_gpt(prompt):
         "Authorization": f"Bearer {api_key}"
     }
     data = {
-        "model": "gpt-4o",
+        "model": "Llama-3.1-405B",
         "messages": [{"role": "user", "content": prompt}],
         "temperature": 0,
         "n": 1
