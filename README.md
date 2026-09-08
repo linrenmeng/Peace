@@ -1,5 +1,5 @@
 # NEW！！
-Thank you for your attention. Currently, due to the use of AI to clean sensitive information, some data in the warehouse is missing. The newly tested and reproducible version will be uploaded to 2026.9.6 . Please be patient and wait.
+Thank you for your attention. Currently, due to the use of AI to clean sensitive information, some data in the warehouse is missing. The new version that has been tested and can be reproduced has been completed. It will be uploaded within 2 days after it passes the open-source review.
 
 
 # Peace: Towards Efficient Project-Level Performance Optimization via Hybrid Code Editing
